@@ -26,11 +26,10 @@ func (k *Keeper) ExportGenesis(ctx context.Context) (*envoy.GenesisState, error)
 		return nil, err
 	}
 	var locks []envoy.Lock
-	visit := func(index string, lock envoy.Lock) (bool, error) {
+	err = k.Locks.Walk(ctx, nil, func(index string, lock envoy.Lock) (bool, error) {
 		locks = append(locks, lock)
 		return false, nil
-	}
-	err = k.Locks.Walk(ctx, nil, visit)
+	})
 	if err != nil {
 		return nil, err
 	}

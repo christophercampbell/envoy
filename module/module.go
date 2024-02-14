@@ -22,6 +22,12 @@ var (
 	_ module.AppModuleBasic = AppModule{}
 	_ module.HasGenesis     = AppModule{}
 	_ appmodule.AppModule   = AppModule{}
+
+	// _ appmodule.HasPreBlocker   = AppModule{}
+	_ appmodule.HasBeginBlocker = AppModule{}
+	_ appmodule.HasEndBlocker   = AppModule{}
+	_ appmodule.HasPrecommit    = AppModule{}
+	// _ appmodule.HasEventListeners = AppModule{}
 )
 
 // ConsensusVersion defines the current module consensus version.
