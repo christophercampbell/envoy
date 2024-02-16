@@ -9,7 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	modulev1 "github.com/polygon/envoy/api/module/v1"
+	envoyv1 "github.com/polygon/envoy/api/module/v1"
 	"github.com/polygon/envoy/keeper"
 )
 
@@ -23,7 +23,7 @@ func (am AppModule) IsAppModule() {}
 
 func init() {
 	appmodule.Register(
-		&modulev1.Module{},
+		&envoyv1.Module{},
 		appmodule.Provide(ProvideModule),
 	)
 }
@@ -35,17 +35,19 @@ type ModuleInputs struct {
 	StoreService store.KVStoreService
 	AddressCodec address.Codec
 
-	Config *modulev1.Module
+	Config *envoyv1.Module
 }
 
 type ModuleOutputs struct {
 	depinject.Out
 
-	Module appmodule.AppModule
-	Keeper keeper.Keeper
+	Module  appmodule.AppModule
+	Keeper  keeper.Keeper
+	Tracker *Tracker
 }
 
 func ProvideModule(in ModuleInputs) ModuleOutputs {
+
 	// default to governance as authority if not provided
 	authority := authtypes.NewModuleAddress("gov")
 	if in.Config.Authority != "" {
@@ -53,7 +55,8 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 	}
 
 	k := keeper.NewKeeper(in.Cdc, in.AddressCodec, in.StoreService, authority.String())
-	m := NewAppModule(in.Cdc, k)
+	t := Tracker{}
+	m := NewAppModule(in.Cdc, k, &t)
 
-	return ModuleOutputs{Module: m, Keeper: k}
+	return ModuleOutputs{Module: m, Keeper: k, Tracker: &t}
 }
